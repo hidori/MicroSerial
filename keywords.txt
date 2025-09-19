@@ -1,0 +1,25 @@
+#######################################
+# Syntax Coloring Map For MicroSerial
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+MicroSerial_begin	KEYWORD2
+MicroSerial_print	KEYWORD2
+MicroSerial_println	KEYWORD2
+MicroSerial_printhex	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+MICRO_SERIAL_HANDLE	LITERAL1
+MICRO_SERIAL_TX	LITERAL1
+MICRO_SERIAL_DELAY	LITERAL1
+MICRO_SERIAL_AVR	LITERAL1
