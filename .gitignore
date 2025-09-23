@@ -5,5 +5,4 @@
 tmp/
 build/
 *.lst
-examples/*/MicroWire.cpp
-examples/*/MicroDebugSerial.cpp
+a.out
