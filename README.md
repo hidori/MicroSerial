@@ -20,11 +20,12 @@ The following table shows the compiled size of MicroSerial library functions for
 
 | Target | FQBN | MicroSerial Size (bytes) |
 |--------|------|----------------------|
-| Arduino UNO | `arduino:avr:uno` | ~150 |
-| Arduino Leonardo | `arduino:avr:leonardo` | ~150 |
-| ATtiny85 (Digispark) | `ATTinyCore:avr:attinyx5micr` | ~130 |
-| ATtiny85 | `ATTinyCore:avr:attinyx5:chip=85` | ~130 |
-| ATtiny13 | `MicroCore:avr:13` | ~120 |
+| Arduino UNO | `arduino:avr:uno` | 408 |
+| Arduino Nano | `arduino:avr:nano` | 408 |
+| Arduino Leonardo | `arduino:avr:leonardo` | 408 |
+| Pro Micro | `SparkFun:avr:promicro` | 408 |
+| ATtiny85 | `ATTinyCore:avr:attinyx5:chip=85` | 368 |
+| ATtiny13 | `MicroCore:avr:13` | 364 |
 
 *Note: Measurements are approximate. Actual size may vary depending on optimization level and used functions.*
 
@@ -33,23 +34,29 @@ The following table shows the compiled size of MicroSerial library functions for
 ### AVR Microcontrollers (Optimized)
 
 - **ATtiny13** (MicroCore) - Direct register manipulation
-- **ATtiny85** (ATTinyCore, DigiSpark) - Direct register manipulation
+- **ATtiny85** (ATTinyCore) - Direct register manipulation
 - **ATmega328P** (Arduino UNO/Nano) - Direct register manipulation
 - **ATmega32U4** (Arduino Pro Micro, Leonardo) - Direct register manipulation
 - Other AVR microcontrollers with PORTB pins - Direct register manipulation
 
 ### Other Platforms (Compatible)
 
-- **ESP32, ESP8266** - Uses digitalWrite
+- **ESP32** (ESP32-C3) - Uses digitalWrite
 - **RP2040** (Raspberry Pi Pico) - Uses digitalWrite
-- **STM32** - Uses digitalWrite
-- Any Arduino-compatible platform with pinMode/digitalWrite support
+- **Others** - Uses digitalWrite for any other Arduino-compatible platform with pinMode/digitalWrite support
 
 **Note**: The library automatically detects AVR platforms and uses optimized register operations (DDRB, PORTB) for maximum efficiency. On non-AVR platforms, it falls back to standard Arduino functions for broader compatibility.
 
-**Important**: On AVR platforms, the library currently uses PORTB-specific register operations. This means pin numbers must correspond to PORTB pins (PB0-PB7). AVR microcontrollers with different port layouts may require code modifications.
+**Important**: Pin definitions should be handled using preprocessor directives for cross-platform compatibility. Example:
 
-**Pin Number Difference**: AVR platforms use PORTB bit numbers (0-7), while non-AVR platforms use standard Arduino digital pin numbers. The same `MICRO_SERIAL_HANDLE(PB2, 9600)` call means PB2 on AVR but GPIO2 on ESP32.
+```cpp
+#if defined(__AVR__)
+#define TX PB0  // AVR platforms use PORTB bit numbers
+#else
+#define TX 2    // Non-AVR platforms use standard pin numbers
+#endif
+#define SERIAL_HANDLE MICRO_SERIAL_HANDLE(TX, 9600)
+```
 
 ## Installation
 
@@ -71,26 +78,43 @@ The following table shows the compiled size of MicroSerial library functions for
 ```cpp
 #include "MicroSerial.h"
 
-// Define serial using PORTB bit number (PB2) on AVR, baud rate 9600
-// Or digital pin number on non-AVR platforms
-#define SERIAL_HANDLE MICRO_SERIAL_HANDLE(PB2, 9600)
+// Define TX pin based on platform
+#if defined(__AVR__)
+#define TX PB0  // Use PORTB bit number on AVR
+#else
+#define TX 2    // Use digital pin number on other platforms
+#endif
+
+#define HANDLE MICRO_SERIAL_HANDLE(TX, 9600)
 
 void setup() {
   // Initialize serial communication
-  MicroSerial_begin(SERIAL_HANDLE);
-
-  // Send hello message
-  MicroSerial_print(SERIAL_HANDLE, "Hello, World!");
-  MicroSerial_println(SERIAL_HANDLE);
+  MicroSerial_begin(HANDLE);
+  delay(100);
 }
 
 void loop() {
-  // Send data
-  MicroSerial_print(SERIAL_HANDLE, "Data: ");
-  MicroSerial_printhex(SERIAL_HANDLE, (uint8_t)42);
-  MicroSerial_println(SERIAL_HANDLE);
+  // Send various types of data
+  MicroSerial_newline(HANDLE);
+  MicroSerial_print(HANDLE, '-');
+  MicroSerial_println(HANDLE, '-');
+  MicroSerial_println(HANDLE, "Hi!");
 
-  delay(1000);  // Wait 1 second
+  // Send integers
+  MicroSerial_print(HANDLE, " int:");
+  MicroSerial_printdec(HANDLE, 12345);
+  MicroSerial_newline(HANDLE);
+  MicroSerial_print(HANDLE, "uint:");
+  MicroSerial_printdecln(HANDLE, -12345);
+
+  // Send hexadecimal values
+  MicroSerial_print(HANDLE, "byte:");
+  MicroSerial_printhex(HANDLE, 0x12, 2);
+  MicroSerial_newline(HANDLE);
+  MicroSerial_print(HANDLE, "word:");
+  MicroSerial_printhexln(HANDLE, 0x1234, 4);
+
+  delay(3000);
 }
 ```
 
@@ -152,7 +176,7 @@ Uses PORTB bit numbers (0-7) directly:
 #define SERIAL_HANDLE MICRO_SERIAL_HANDLE(PB2, 9600)  // Uses bit number 2
 ```
 
-### Non-AVR Platforms (ESP32, RP2040, STM32, etc.)
+### Non-AVR Platforms (ESP32, RP2040, Others)
 
 Uses Arduino digital pin numbers:
 
@@ -229,6 +253,12 @@ Maximum delay: 4095 μs → Minimum baud rate: ~245 bps
 - **May work**: 19200 bps (depending on conditions)
 - **Typically fails**: 38400 bps and above
 
+#### Arduino Leonardo/Pro Micro (ATmega32U4 @ 16MHz)
+
+- **Reliable range**: 300 bps - 9600 bps
+- **May work**: 19200 bps (depending on conditions)
+- **Typically fails**: 38400 bps and above
+
 #### ATtiny85 (@ 8MHz or lower)
 
 - **Reliable range**: 300 bps - 4800 bps
@@ -260,16 +290,31 @@ Start with conservative baud rates (1200-4800 bps) and test higher rates if need
 
 ### Output Functions
 
+#### Character and String Output
 - `MicroSerial_print(uint16_t handle, char ch)` - Send a single character
-- `MicroSerial_print(uint16_t handle, char* text)` - Send a string
-- `MicroSerial_println(uint16_t handle)` - Send a newline character
-- `MicroSerial_printhex(uint16_t handle, uint8_t data)` - Send a byte as hexadecimal
+- `MicroSerial_print(uint16_t handle, const char* str)` - Send a string
+- `MicroSerial_println(uint16_t handle, char ch)` - Send a character and newline
+- `MicroSerial_println(uint16_t handle, const char* str)` - Send a string and newline
+- `MicroSerial_newline(uint16_t handle)` - Send a newline character only
+
+#### Numeric Output
+- `MicroSerial_printdec(uint16_t handle, int data)` - Send a signed integer (decimal)
+- `MicroSerial_printdecln(uint16_t handle, int data)` - Send a signed integer and newline
+- `MicroSerial_printdec(uint16_t handle, unsigned int data)` - Send an unsigned integer (decimal)
+- `MicroSerial_printdecln(uint16_t handle, unsigned int data)` - Send an unsigned integer and newline
+
+#### Hexadecimal Output
+- `MicroSerial_printhex(uint16_t handle, int data, int digits)` - Send a value as hexadecimal with specified digits
+- `MicroSerial_printhexln(uint16_t handle, uint16_t data, int digits)` - Send a hexadecimal value and newline
+
+### Low-level Functions
+
+- `MicroSerial_tx_low(uint8_t tx)` - Set TX pin LOW (internal use)
+- `MicroSerial_tx_high(uint8_t tx)` - Set TX pin HIGH (internal use)
 
 ### Macros
 
-- `MICRO_SERIAL_HANDLE(tx, baudrate)` - Create serial configuration
-- `MICRO_SERIAL_TX(handle)` - Extract TX pin from configuration
-- `MICRO_SERIAL_DELAY(handle)` - Extract bit delay from configuration
+- `MICRO_SERIAL_HANDLE(tx, baudrate)` - Create serial configuration handle
 
 ## Examples
 

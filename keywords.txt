@@ -11,15 +11,18 @@
 #######################################
 
 MicroSerial_begin	KEYWORD2
+MicroSerial_newline	KEYWORD2
 MicroSerial_print	KEYWORD2
 MicroSerial_println	KEYWORD2
+MicroSerial_printdec	KEYWORD2
+MicroSerial_printdecln	KEYWORD2
 MicroSerial_printhex	KEYWORD2
+MicroSerial_printhexln	KEYWORD2
+MicroSerial_tx_low	KEYWORD2
+MicroSerial_tx_high	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
 #######################################
 
 MICRO_SERIAL_HANDLE	LITERAL1
-MICRO_SERIAL_TX	LITERAL1
-MICRO_SERIAL_DELAY	LITERAL1
-MICRO_SERIAL_AVR	LITERAL1
