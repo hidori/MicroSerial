@@ -3,7 +3,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2025 Hiroaki SHIBUKI
+ * Copyright (c) 2025 Hiroaki SHIBUKI a.k.a. hidori
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -49,8 +49,6 @@
 #else
 #define MICRO_SERIAL_DELAY_US(x) delayMicroseconds(x)
 #endif
-#else
-#define MICRO_SERIAL_DELAY_US(x)
 #endif
 
 // Initialize serial communication
