@@ -3,7 +3,12 @@
 #include <Arduino.h>
 #include "MicroSerial.h"
 
-#define HANDLE MICRO_SERIAL_HANDLE(PB0, 9600)
+#if defined(__AVR__)
+#define TX PB0
+#else
+#define TX 2
+#endif
+#define HANDLE MICRO_SERIAL_HANDLE(TX, 9600)
 
 void setup() {
   MicroSerial_begin(HANDLE);
@@ -11,25 +16,22 @@ void setup() {
 }
 
 void loop() {
-  MicroSerial_print(HANDLE, 'H');
-  MicroSerial_print(HANDLE, 'e');
-  MicroSerial_print(HANDLE, 'l');
-  MicroSerial_print(HANDLE, 'l');
-  MicroSerial_print(HANDLE, 'o');
-  MicroSerial_print(HANDLE, ' ');
-  MicroSerial_print(HANDLE, "MicroSerial!");
-  MicroSerial_println(HANDLE);
+  MicroSerial_newline(HANDLE);
+  MicroSerial_print(HANDLE, '-');
+  MicroSerial_println(HANDLE, '-');
+  MicroSerial_println(HANDLE, "Hi!");
 
-  MicroSerial_print(HANDLE, "8bit hex: 0x");
-  MicroSerial_printhex(HANDLE, 0xAB);
-  MicroSerial_println(HANDLE);
+  MicroSerial_print(HANDLE, " int:");
+  MicroSerial_printdec(HANDLE, 12345);
+  MicroSerial_newline(HANDLE);
+  MicroSerial_print(HANDLE, "uint:");
+  MicroSerial_printdecln(HANDLE, -12345);
 
-  MicroSerial_print(HANDLE, "16bit hex: 0x");
-  MicroSerial_printhex(HANDLE, 0x12);
-  MicroSerial_printhex(HANDLE, 0x34);
-  MicroSerial_println(HANDLE);
-
-  MicroSerial_println(HANDLE);
+  MicroSerial_print(HANDLE, "byte:");
+  MicroSerial_printhex(HANDLE, 0x12, 2);
+  MicroSerial_newline(HANDLE);
+  MicroSerial_print(HANDLE, "word:");
+  MicroSerial_printhexln(HANDLE, 0x1234, 4);
 
   delay(3000);
 }
