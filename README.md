@@ -291,6 +291,7 @@ Start with conservative baud rates (1200-4800 bps) and test higher rates if need
 ### Output Functions
 
 #### Character and String Output
+
 - `MicroSerial_print(uint16_t handle, char ch)` - Send a single character
 - `MicroSerial_print(uint16_t handle, const char* str)` - Send a string
 - `MicroSerial_println(uint16_t handle, char ch)` - Send a character and newline
@@ -298,12 +299,14 @@ Start with conservative baud rates (1200-4800 bps) and test higher rates if need
 - `MicroSerial_newline(uint16_t handle)` - Send a newline character only
 
 #### Numeric Output
+
 - `MicroSerial_printdec(uint16_t handle, int data)` - Send a signed integer (decimal)
 - `MicroSerial_printdecln(uint16_t handle, int data)` - Send a signed integer and newline
 - `MicroSerial_printdec(uint16_t handle, unsigned int data)` - Send an unsigned integer (decimal)
 - `MicroSerial_printdecln(uint16_t handle, unsigned int data)` - Send an unsigned integer and newline
 
 #### Hexadecimal Output
+
 - `MicroSerial_printhex(uint16_t handle, int data, int digits)` - Send a value as hexadecimal with specified digits
 - `MicroSerial_printhexln(uint16_t handle, uint16_t data, int digits)` - Send a hexadecimal value and newline
 

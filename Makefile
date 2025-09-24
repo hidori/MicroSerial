@@ -17,6 +17,7 @@ endef
 
 define build-sketch
 	arduino-cli compile \
+		--library ./src \
 		--fqbn $(1) \
 		--export-binaries \
 		$(if $(filter-out undefined,$(origin DEBUG)),--build-property "build.extra_flags=-DDEBUG") \
@@ -96,9 +97,9 @@ install/lib:
 
 .PHONY: uninstall/lib
 uninstall/lib:
-	@if [ ! -f ~/.arduino15/arduino-cli.yaml ]; then arduino-cli config init; fi
-	arduino-cli --config-file $(BUILD_CONFIG) lib update-index
-	arduino-cli --config-file $(BUILD_CONFIG) lib uninstall $(LIBS)
+# 	@if [ ! -f ~/.arduino15/arduino-cli.yaml ]; then arduino-cli config init; fi
+# 	arduino-cli --config-file $(BUILD_CONFIG) lib update-index
+# 	arduino-cli --config-file $(BUILD_CONFIG) lib uninstall $(LIBS)
 
 .PHONY: install/gcc
 install/gcc:
