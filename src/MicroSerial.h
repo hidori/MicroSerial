@@ -30,33 +30,55 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-// Platform detection
-#if defined(__AVR__)
-#define MICRO_SERIAL_AVR
-#endif
+// Macros
 
-// Serial configuration
+// Create handle
 #define MICRO_SERIAL_HANDLE(tx, baudrate) ((uint16_t)(((0x0f & (uint16_t)tx) << 12) | (0x0fff & (1000000UL / (uint16_t)baudrate))))
 
-// Get Serial TX pin number
-#define MICRO_SERIAL_TX(handle) ((handle >> 12) & 0x0f)
-
-// Get Serial bit delay in microseconds
-#define MICRO_SERIAL_DELAY(handle) (handle & 0x0fff)
+// High-level APIs
 
 // Initialize serial communication
 void MicroSerial_begin(uint16_t handle);
 
+// Send a newline
+void MicroSerial_newline(uint16_t handle);
+
 // Send a character
 void MicroSerial_print(uint16_t handle, char ch);
 
+// Send a character and newline
+void MicroSerial_println(uint16_t handle, char ch);
+
 // Send a string
-void MicroSerial_print(uint16_t handle, char* text);
+void MicroSerial_print(uint16_t handle, const char* str);
 
-// Send a newline
-void MicroSerial_println(uint16_t handle);
+// Send a string and newline
+void MicroSerial_println(uint16_t handle, const char* str);
 
-// Send a byte as hexadecimal
-void MicroSerial_printhex(uint16_t handle, uint8_t data);
+// Send an integer
+void MicroSerial_printdec(uint16_t handle, int data);
+
+// Send an integer and newline
+void MicroSerial_printdecln(uint16_t handle, int data);
+
+// Send an unsigned integer
+void MicroSerial_printdec(uint16_t handle, unsigned int data);
+
+// Send an unsigned integer and newline
+void MicroSerial_printdecln(uint16_t handle, unsigned int data);
+
+// Send a hex value
+void MicroSerial_printhex(uint16_t handle, int data, int digits);
+
+// Send a hex value and newline
+void MicroSerial_printhexln(uint16_t handle, uint16_t data, int digits);
+
+// Low-level APIs
+
+// Set TX pin LOW
+void MicroSerial_tx_low(uint8_t tx);
+
+// Set TX pin HIGH
+void MicroSerial_tx_high(uint8_t tx);
 
 #endif  // __MICRO_SERIAL_H__
