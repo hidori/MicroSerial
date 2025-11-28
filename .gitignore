@@ -1,8 +1,7 @@
-.github/copilot-instructions.md
-.vscode/c_cpp_properties.json
-.vscode/cspell.json
-.vscode/settings.json
 tmp/
+bin/
+coverage/
 build/
 *.lst
+*.map
 a.out
